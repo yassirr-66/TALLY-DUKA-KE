@@ -47,6 +47,8 @@ export interface Business {
   owner: string;
   type: BusinessType;
   pin: string; // Empty string means PIN lock is disabled
+  recoveryQuestion?: string;
+  recoveryAnswer?: string;
   updatedAt?: string;
 }
 

@@ -24,6 +24,8 @@ export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({
   const [owner, setOwner] = useState('');
   const [type, setType] = useState<BusinessType>('Retail shop');
   const [pin, setPin] = useState('');
+  const [recoveryQuestion, setRecoveryQuestion] = useState('What is your favorite place or childhood nickname?');
+  const [recoveryAnswer, setRecoveryAnswer] = useState('');
   const [error, setError] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -31,6 +33,7 @@ export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({
     const cleanName = name.trim();
     const cleanOwner = owner.trim();
     const cleanPin = pin.trim();
+    const cleanAnswer = recoveryAnswer.trim();
 
     if (!cleanName) {
       setError('Please enter your shop or business name.');
@@ -51,6 +54,8 @@ export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({
       owner: cleanOwner,
       type,
       pin: cleanPin,
+      recoveryQuestion: cleanPin && cleanAnswer ? recoveryQuestion.trim() || 'Recovery question' : '',
+      recoveryAnswer: cleanPin ? cleanAnswer : '',
     });
   };
 
@@ -157,6 +162,42 @@ export const OnboardingScreen: React.FC<OnboardingScreenProps> = ({
               All your records stay safely on this phone and work offline.
             </p>
           </div>
+
+          {pin.length > 0 && (
+            <div className="space-y-3 rounded-2xl border border-slate-200 bg-slate-50 p-3.5 dark:border-slate-800 dark:bg-slate-800/40">
+              <div>
+                <label
+                  htmlFor="onboard-recovery-q"
+                  className="mb-1 block text-xs font-medium text-slate-700 dark:text-slate-200"
+                >
+                  PIN recovery question (in case you forget PIN)
+                </label>
+                <input
+                  id="onboard-recovery-q"
+                  type="text"
+                  value={recoveryQuestion}
+                  onChange={(e) => setRecoveryQuestion(e.target.value)}
+                  className="min-h-[42px] w-full rounded-xl border border-slate-200 bg-white px-3 text-sm dark:border-slate-700 dark:bg-slate-950"
+                />
+              </div>
+              <div>
+                <label
+                  htmlFor="onboard-recovery-a"
+                  className="mb-1 block text-xs font-medium text-slate-700 dark:text-slate-200"
+                >
+                  Recovery answer (optional)
+                </label>
+                <input
+                  id="onboard-recovery-a"
+                  type="text"
+                  value={recoveryAnswer}
+                  onChange={(e) => setRecoveryAnswer(e.target.value)}
+                  placeholder="e.g. Nakuru"
+                  className="min-h-[42px] w-full rounded-xl border border-slate-200 bg-white px-3 text-sm dark:border-slate-700 dark:bg-slate-950"
+                />
+              </div>
+            </div>
+          )}
 
           <button
             type="submit"

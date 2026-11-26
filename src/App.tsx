@@ -32,6 +32,7 @@ import {
   applyDeleteSale,
   applyEditExpense,
   applyEditSale,
+  applyResetPin,
   applyRestockProduct,
   applySaveBusiness,
   applySetTheme,
@@ -139,9 +140,10 @@ export default function App() {
   if (db.business.pin && !pinUnlocked) {
     return (
       <PinLockScreen
-        businessName={db.business.name}
-        expectedPin={db.business.pin}
+        business={db.business}
         onUnlock={() => setPinUnlocked(true)}
+        onResetPin={(nextPin) => updateDb((prev) => applyResetPin(prev, nextPin))}
+        onClearAll={handleClearAll}
       />
     );
   }

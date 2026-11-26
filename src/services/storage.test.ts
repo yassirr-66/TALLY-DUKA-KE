@@ -6,9 +6,12 @@ import {
   applyDebtPayment,
   applyDeleteSale,
   applyEditSale,
+  applyResetPin,
   applyRestockProduct,
+  applySaveBusiness,
   applyStockAdjustment,
   createEmptyDatabase,
+  verifyPinRecovery,
 } from './storage';
 
 test('adding a Credit/Debt sale deducts stock, records movement, and creates debt', () => {
@@ -164,3 +167,50 @@ test('applyDebtPayment transitions status from unpaid -> partial -> paid', () =>
   assert.equal(db.debts[0].amountPaid, 500);
   assert.equal(db.debts[0].status, 'paid');
 });
+
+test('verifyPinRecovery checks recovery answer when configured, or owner + business type fallback', () => {
+  const withRecovery = {
+    name: 'Neema Duka',
+    owner: 'Amina Mwangi',
+    type: 'Retail shop' as const,
+    pin: '1234',
+    recoveryQuestion: 'First school?',
+    recoveryAnswer: 'Kiambu Primary',
+  };
+  assert.equal(verifyPinRecovery(withRecovery, { answer: '  kiambu primary ' }), true);
+  assert.equal(verifyPinRecovery(withRecovery, { answer: 'Wrong' }), false);
+  assert.equal(
+    verifyPinRecovery(withRecovery, { ownerName: 'Amina Mwangi', businessType: 'Retail shop' }),
+    true
+  );
+
+  const withoutRecovery = {
+    name: 'Neema Duka',
+    owner: 'Amina Mwangi',
+    type: 'Retail shop' as const,
+    pin: '1234',
+  };
+  assert.equal(
+    verifyPinRecovery(withoutRecovery, { ownerName: 'amina mwangi', businessType: 'Retail shop' }),
+    true
+  );
+  assert.equal(
+    verifyPinRecovery(withoutRecovery, { ownerName: 'Someone Else', businessType: 'Retail shop' }),
+    false
+  );
+});
+
+test('applyResetPin updates or clears the shop PIN', () => {
+  let db = createEmptyDatabase();
+  db = applySaveBusiness(db, {
+    name: 'Neema Duka',
+    owner: 'Amina Mwangi',
+    type: 'Retail shop',
+    pin: '1234',
+  });
+  db = applyResetPin(db, '5678');
+  assert.equal(db.business?.pin, '5678');
+  db = applyResetPin(db, '');
+  assert.equal(db.business?.pin, '');
+});
+

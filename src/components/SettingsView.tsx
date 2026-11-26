@@ -46,6 +46,10 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
   const [bizError, setBizError] = useState('');
 
   const [newPin, setNewPin] = useState(business.pin || '');
+  const [recoveryQuestion, setRecoveryQuestion] = useState(
+    business.recoveryQuestion || 'What is your favorite place or childhood nickname?'
+  );
+  const [recoveryAnswer, setRecoveryAnswer] = useState(business.recoveryAnswer || '');
   const [pinNotice, setPinNotice] = useState('');
   const [pinError, setPinError] = useState('');
 
@@ -87,6 +91,8 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
     onSaveBusiness({
       ...business,
       pin: clean,
+      recoveryQuestion: clean && recoveryAnswer.trim() ? recoveryQuestion.trim() || 'Recovery question' : '',
+      recoveryAnswer: clean ? recoveryAnswer.trim() : '',
     });
     setPinNotice(clean ? '4-digit PIN lock saved.' : 'PIN lock turned off.');
     setTimeout(() => setPinNotice(''), 2500);
@@ -234,6 +240,41 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                   Update PIN
                 </button>
               </div>
+              {newPin.length > 0 && (
+                <div className="space-y-2.5 rounded-xl bg-slate-50 p-3 dark:bg-slate-950">
+                  <div>
+                    <label
+                      htmlFor="set-recovery-q"
+                      className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-300"
+                    >
+                      Recovery question (used if you forget PIN)
+                    </label>
+                    <input
+                      id="set-recovery-q"
+                      type="text"
+                      value={recoveryQuestion}
+                      onChange={(e) => setRecoveryQuestion(e.target.value)}
+                      className="min-h-[40px] w-full rounded-lg border border-slate-200 bg-white px-3 text-xs dark:border-slate-700 dark:bg-slate-900"
+                    />
+                  </div>
+                  <div>
+                    <label
+                      htmlFor="set-recovery-a"
+                      className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-300"
+                    >
+                      Recovery answer
+                    </label>
+                    <input
+                      id="set-recovery-a"
+                      type="text"
+                      value={recoveryAnswer}
+                      onChange={(e) => setRecoveryAnswer(e.target.value)}
+                      placeholder="e.g. Nakuru"
+                      className="min-h-[40px] w-full rounded-lg border border-slate-200 bg-white px-3 text-xs dark:border-slate-700 dark:bg-slate-900"
+                    />
+                  </div>
+                </div>
+              )}
             </form>
           </section>
 

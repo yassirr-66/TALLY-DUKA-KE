@@ -51,6 +51,37 @@ export function applySaveBusiness(db: DukaDatabase, business: Business): DukaDat
   };
 }
 
+export function verifyPinRecovery(
+  business: Business,
+  attempt: { answer?: string; ownerName?: string; businessType?: string }
+): boolean {
+  const savedAnswer = (business.recoveryAnswer || '').trim().toLowerCase();
+  if (savedAnswer && (attempt.answer || '').trim()) {
+    return (attempt.answer || '').trim().toLowerCase() === savedAnswer;
+  }
+  const cleanOwner = (attempt.ownerName || '').trim().toLowerCase();
+  const cleanType = (attempt.businessType || '').trim();
+  if (cleanOwner && cleanType) {
+    return (
+      cleanOwner === business.owner.trim().toLowerCase() &&
+      cleanType === business.type
+    );
+  }
+  return false;
+}
+
+export function applyResetPin(db: DukaDatabase, newPin: string): DukaDatabase {
+  if (!db.business) return db;
+  return {
+    ...db,
+    business: {
+      ...db.business,
+      pin: newPin.trim(),
+      updatedAt: new Date().toISOString(),
+    },
+  };
+}
+
 export function applySetTheme(db: DukaDatabase, theme: ThemeMode): DukaDatabase {
   return { ...db, theme };
 }
